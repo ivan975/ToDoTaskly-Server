@@ -18,6 +18,7 @@ const client = new MongoClient(uri);
 
 
 const tasks = client.db('todoTaskly').collection('tasks');
+const addTasks = client.db('todoTaskly').collection('addTasks');
 
 app.post('/tasks', async (req, res) => {
     try {
@@ -42,6 +43,40 @@ app.post('/tasks', async (req, res) => {
 app.get('/tasks', async (req, res) => {
     try {
         const cursor = await tasks.find({}).toArray();
+        res.send(cursor);
+        console.log(cursor);
+    }
+    catch (error) {
+        console.log(error.name.bgRed, error.message.bold);
+        res.send({
+            success: false,
+            error: error.message,
+        });
+    }
+})
+app.post('/addTasks', async (req, res) => {
+    try {
+        const result = await addTasks.insertOne(req.body);
+
+        if (result.insertedId) {
+            res.send({
+                success: true,
+                message: `Successfully inserted ${result.insertedId}`
+            })
+        }
+    }
+    catch (error) {
+        console.log(error.name.bgRed, error.message.bold);
+        res.send({
+            success: false,
+            error: error.message,
+        });
+    }
+})
+
+app.get('/addTasks', async (req, res) => {
+    try {
+        const cursor = await addTasks.find({}).toArray();
         res.send(cursor);
         console.log(cursor);
     }
