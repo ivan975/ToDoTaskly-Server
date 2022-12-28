@@ -16,6 +16,44 @@ app.use(cors());
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.2f4txuh.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri);
 
+
+const tasks = client.db('todoTaskly').collection('tasks');
+
+app.post('/tasks', async (req, res) => {
+    try {
+        const result = await tasks.insertOne(req.body);
+
+        if (result.insertedId) {
+            res.send({
+                success: true,
+                message: `Successfully inserted ${result.insertedId}`
+            })
+        }
+    }
+    catch (error) {
+        console.log(error.name.bgRed, error.message.bold);
+        res.send({
+            success: false,
+            error: error.message,
+        });
+    }
+})
+
+app.get('/tasks', async (req, res) => {
+    try {
+        const cursor = await tasks.find({}).toArray();
+        res.send(cursor);
+        console.log(cursor);
+    }
+    catch (error) {
+        console.log(error.name.bgRed, error.message.bold);
+        res.send({
+            success: false,
+            error: error.message,
+        });
+    }
+})
+
 async function dbConnection() {
     try {
         await client.connect();
