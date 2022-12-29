@@ -54,6 +54,22 @@ app.get('/tasks', async (req, res) => {
         });
     }
 })
+app.get('/tasks/:id', async (req, res) => {
+    try {
+        const id = req.params.id;
+        const query = { _id: ObjectId(id) };
+        const service = await tasks.findOne(query);
+        res.send(service)
+    }
+    catch (err) {
+        console.log(err.name.bgRed, err.message.bold);
+        res.send({
+            success: false,
+            error: err.message,
+        });
+    }
+})
+
 app.post('/addTasks', async (req, res) => {
     try {
         const result = await addTasks.insertOne(req.body);
@@ -97,6 +113,30 @@ app.delete('/tasks/:taskId', async (req, res) => {
     res.send(result);
 })
 
+app.patch("/tasks/:id", async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const result = await tasks.updateOne({ _id: ObjectId(id) }, { $set: req.body });
+
+        if (result.matchedCount > 0) {
+            res.send({
+                success: true,
+                message: `successfully updated the task`,
+            });
+        } else {
+            res.send({
+                success: false,
+                error: "Couldn't update  the task",
+            });
+        }
+    } catch (error) {
+        res.send({
+            success: false,
+            error: error.message,
+        });
+    }
+});
 
 async function dbConnection() {
     try {
