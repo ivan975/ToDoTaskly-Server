@@ -1,4 +1,4 @@
-const { MongoClient } = require('mongodb');
+const { MongoClient, ObjectId } = require('mongodb');
 const express = require('express');
 const app = express();
 const cors = require('cors');
@@ -88,6 +88,15 @@ app.get('/addTasks', async (req, res) => {
         });
     }
 })
+
+// delete
+app.delete('/tasks/:taskId', async (req, res) => {
+    const id = req.params.taskId;
+    const query = { _id: ObjectId(id) };
+    const result = await tasks.deleteOne(query);
+    res.send(result);
+})
+
 
 async function dbConnection() {
     try {
